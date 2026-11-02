@@ -263,7 +263,7 @@ textarea{resize:vertical;min-height:70px}
     <div class="card sec">
       <div class="sec-h"><span class="tag">GERÄT</span><h2>Speicher</h2></div>
       <dl class="kv" id="stInfo"></dl>
-      <p class="hint" style="margin:10px 0 0">Entwürfe, Fotos und Berichte liegen in der IndexedDB dieses Browsers. Auf dem iPhone die App über „Teilen → Zum Home-Bildschirm“ installieren, dann läuft sie auch ohne Empfang.</p>
+      <p class="hint" style="margin:10px 0 0">Entwürfe, Fotos und Berichte liegen in der IndexedDB dieses Browsers. Auf Android in Chrome über das Menü (⋮) → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“, auf dem iPhone über „Teilen → Zum Home-Bildschirm“. Danach läuft sie auch ohne Empfang.</p>
     </div>
   </section>
 </main>
@@ -645,7 +645,7 @@ function renderDataInfo(){ $("#dsInfo").innerHTML = `<dt>Quelle</dt><dd>${esc(S.
 async function renderStorage(){
   let est=""; try{ const e=await navigator.storage.estimate(); est=`${(e.usage/1048576).toFixed(1)} MB von ca. ${(e.quota/1073741824).toFixed(1)} GB`; }catch(e){ est="unbekannt"; }
   const photos=S.reports.reduce((a,r)=>a+r.cond.reduce((b,c)=>b+c.photos.length,0),0);
-  $("#stInfo").innerHTML=`<dt>Belegt</dt><dd>${esc(est)}</dd><dt>Berichte</dt><dd class="mono">${S.reports.length}</dd><dt>Fotos</dt><dd class="mono">${photos}</dd>`;
+  $("#stInfo").innerHTML=`<dt>Belegt</dt><dd>${esc(est)}</dd><dt>Dauerhaft</dt><dd>${S.persisted?"ja, wird nicht automatisch gelöscht":"nein (App installieren, dann erneut öffnen)"}</dd><dt>Berichte</dt><dd class="mono">${S.reports.length}</dd><dt>Fotos</dt><dd class="mono">${photos}</dd>`;
 }
 function cellStr(v){
   if(v==null) return ""; if(v instanceof Date){ const d=new Date(v.getTime()+12*3600e3); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -757,6 +757,8 @@ window.addEventListener("beforeunload",()=>{ if(S.draft){ try{ DB.set("draft",S.
   setView(LS.get("view","pruefen"));
   await loadDataset();
   if(!IN_ARTIFACT && "serviceWorker" in navigator && location.protocol==="https:"){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+  // Speicher als dauerhaft markieren, damit Android/Chrome Berichte und Fotos nicht bei Platzmangel löscht
+  try{ if(navigator.storage && navigator.storage.persist){ S.persisted = await navigator.storage.persisted() || await navigator.storage.persist(); } }catch(e){}
 })();
 </script>
 </body></html>

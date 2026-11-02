@@ -1,5 +1,5 @@
 /* Service Worker: hält App, Bibliotheken und Haltestellen-Daten offline vor. */
-const VERSION = "wh-pruefung-v1";
+const VERSION = "wh-pruefung-v2"; // bei jedem Update hochzählen
 const SHELL = ["./","index.html","data.json","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png",
   "lib/pdfmake.min.js","lib/vfs_fonts.js","lib/xlsx.full.min.js","lib/jszip.min.js"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
